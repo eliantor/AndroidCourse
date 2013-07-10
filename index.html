@@ -1,0 +1,747 @@
+
+<!--
+Google IO 2012/2013 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahé <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+<!--
+  <slide class="logoslide nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/google_developers_logo.png"></span>
+    </article>
+  </slide>
+-->
+  <slide class="title-slide segue nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+    </hgroup>
+  </slide>
+  
+  <!-- what's android after all -->
+  <!-- componenti del framework -->
+  <!-- tools intro -->
+
+  <slide>
+    <hgroup>
+      <h2>Obiettivi</h2>
+    </hgroup>
+    <article class="flexbox vcenter" >
+      <ol class="build fade">
+      <li><p>
+	  Imparare l'architettura, le API, e i tool di sviluppo su Android.
+      </p></li>
+      <li><p>
+	Acquisire pattern di programmazione adatti a dispositivi resource constrained in java.
+      </p></li>
+      <li><p>
+	Realizzare un'applicazione completa.
+      </p></li>
+      </ol>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup><h2>Struttura del corso</h2></hgroup>
+    <article>
+      <section>
+	<hgroup><h3>5 lezioni di 6 ore</h3></hgroup>
+	<ul>
+	  <li><section>
+	      <h4>3 ore di teoria ed esempi pratici</h4>
+	      <ul>
+		<li>Slide</li>
+		<li>Live Coding</li>
+	      </ul>
+	  </section></li>
+	  <li><section>
+	      <h4>3 ore di esercitazione</h4>
+	      <ul>
+		<li>Mettere in pratica le conoscenze acquisite.</li>
+		<li>Realizzare un'app completa</li>
+	      </ul>
+	  </section></li>
+	</ul>
+      </section>
+      <aside class="build">
+	<h3 class="red3">Possibilità di continuare in una fase di laboratorio.</h3>
+      </aside>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup><h2>Materiale</h2></hgroup>
+    <article>
+      <ul>
+	<li>Codice <a href="https://github.com/eliantor/AndroidCourse">&lt;https://github.com/eliantor/AndroidCourse&gt;</a></li>
+	<li>Groups <a href="https://groups.google.com/forum/#!forum/androidcourses">&lt;https://groups.google.com/forum/#!forum/androidcourses&gt;</a></li>
+  <li>Slide <a href="">&lt;drive.google.com&gt;</a></li>
+	<li>Riferimenti, libri, link contenuti video ecc</li>
+      </ul>
+      
+    </article>
+    <footer><small>*il materiale verrà aggiornato lezione per lezione</small></footer>
+  </slide>
+  
+  <slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Prima lezione</h2>
+      <h3>Android OS e introduzione al framework</h3>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup><h2>Storia</h2></hgroup>
+    <article>
+      <ul class="build">
+	<li><span class="blue3">2003</span> Nasce il progetto da Android Inc. fondata da Andy Rubin e Rich Miner</li>
+	<li><span class="blue3">2005</span> Acquisizione Google </li>
+	<li><span class="blue3">2007</span> Open Handset Alliance</li>
+	<li><span class="blue3">2008</span> HTC Dream (T Mobile G1) rilasciato il 22 ottobre</li>
+	<li><span class="blue3">2009</span> 2.8% del market share</li>
+	<li><span class="blue3">2011</span> +4.4% di crescita per settimana</li>
+	<li><span class="blue3">2013</span> 64% del mercato mobile</li>
+	<li><span class="blue3">2013+</span> Android Everywhere: GoogleTV, Project Glass, Media players, Android@Home, Project Shield...</li>  
+      </ul>
+    </article>
+  </slide>
+   <slide class="fill nobackground" style="background-image: url(images/amirror.jpg)">
+    <hgroup>
+      <h2 class="white">SPECCHI!!</h2>
+    </hgroup>
+    <footer class="source black">www.cybertecturemirror.com</footer>
+  </slide>
+
+  <slide class="fill nobackground" style="background-image: url(images/andy-rubin.png)">
+    <hgroup>
+      <h2 class="white">...e fotocamere</h2>
+    </hgroup>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <img src="images/dslr.jpg"/>
+    <footer class="source white">Andy Rubin</footer>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Mindset</h2>
+      <h3>Di cosa devo tener conto quando scrivo un'app android</h3>
+    </hgroup>
+    <article>
+      <ul class="build" style="list-style-type:none">
+	<li><ul>
+	<li class="green3">Intero sistema operativo a disposizione (Api potenti)</li>
+	<li class="green3">Tutte le app sono create uguali</li>
+	<li class="green3">App come servizi integrati</li>
+	<li class="green3">Applicazioni event driven e context based (gps, sensori, touch,audio,camera)</li>
+	<li class="green3">Varietà di scelta dei dispositivi</li>
+	</ul></li>
+	<li><ul>
+	<li class="red3">Risorse limitate (memoria, batteria, banda)</li>
+	<li class="red3">Use cases complessi, le app non hanno un main</li>
+	<li class="red3">Callback hell</li>
+	<li class="red3">Frammentazione del mercato</li>
+      </ul></li>
+      </ul>
+    </article>
+  </slide>
+  
+  <slide>
+    <hgroup>
+      <h2>Architettura</h2>
+    </hgroup>
+    <article class="columns-2">
+     <div>
+      <ul class="build">
+	<li>Linux (Experimental branch start merge mainline 3.8)</li>
+	<li>Binder IPC (driver al cuore del funzionamento di android)</li>
+	<li>Dalvik (vm a registri che esegue dex bytecode)</li>
+	<li>System Services (WindowManager, Audio, Networking, Telephony ...)</li>
+	<li>SDK libs (le API a nostra disposizione)</li>
+	<li>Java (versione 6)</li>
+      </ul>
+      </div>
+      <div><img src="images/system_architecture1.png"/></div>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Building blocks</h2>
+      <h3>intro</h3>
+    </hgroup>
+    <article class="flexbox vcenter build fade">
+      <p>Un'app android é costituita da <span class="red3">componenti</span> attivi (lousely coupled) e da un insieme di <span class="red3">risorse</span>.<br/>Questi pezzi disaccoppiati sono uniti insieme a runtime in un'unica <span class="red3">Application (Context)</span> da un file di configurazione <span class="red3">manifest</span>.
+      </p>
+      <p>Una caratteristica fondamentale di Android é che un app puó attivare direttamente un componente di un'altra applicazione, inviando messaggi <span class="red3">intent</span> o richiamando specifiche <span class="red3">uri</span>. Il manifest specifica quali messaggi un componente é in grado di ricevere tramite specifici <span class="red3">filtri</span>.</p>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Building blocks</h2>
+      <h3>components</h3>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/app_components.png"/>
+    </article>
+  </slide>
+  
+
+  <slide>
+    <hgroup>
+      <h2>App basics</h2>
+      <h3>Organizzazione</h3>
+    </hgroup>
+    <article class="build fade smaller">
+      <section>
+        <ul>
+          <li>src/ (contiene il codice java)</li>
+          <li>res/ (contiene le risorse dell'app)</li>
+          <li>assets/ (file system interno readonly)</li>
+          <li>gen/ (codice generato dai tool)</li>
+          <li>Il manifest</li>
+        </ul>
+
+      </section>
+      <section>
+        <pre class="prettyprint" data-lang="xml">
+        &lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          <b>package="corso.sample"</b>
+          android:versionCode="1"
+          android:versionName="1.0" &gt;
+          &lt;uses-sdk
+            android:minSdkVersion="9"
+            android:targetSdkVersion="17"/&gt;
+          <b>&lt;application
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"&gt;
+          &lt;/application&gt;</b>
+        &lt;/manifest&gt;</pre>
+      </section>
+    </article>
+  </slide>
+
+  <slide class="segue fill nobackground" style="background-image: url(images/tooling.jpg)">
+        <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2 class="white">TOOLING</h2>
+    </hgroup>
+  </slide>
+  
+
+
+  <slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2 class="blue3">Activity</h2>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Activity</h2>
+      <h3>intro</h3>
+    </hgroup>
+    <article>
+      <p>
+      Un'activity rappresenta una schermata (di solito copre l'intera finestra) con cui l'utente puó interagire per
+      realizzare un'azione.
+      </p>
+      <ul class="build">
+        <li>Pattern MVC</li>
+        <li>Attivata da un'intent</li>
+        <li>Ha un layout (vista), tipicamente associato tramite una risorsa xml</li>
+        <li>Puó far partire altre activity</li>
+        <li>Piú activity costituiscono un task</li>
+        <li>Ciclo di vita gestito dal sistema</li>
+        <li>Puó contenere fragments e loaders</li>
+      </ul>
+    </article>
+  </slide>
+  
+  <slide >
+    <hgroup>
+      <h2>Activity</h2>
+      <h3>lifecycle</h3>
+    </hgroup>
+    <article class="columns-2">
+      <img src="images/activity_lifecycle.png"/>
+      <ul class="build">
+        <li>Un'activity puó essere distrutta dal sistema per recuperare memoria</li>
+        <li>L'intero processo dell'applicazione puó essere terminato dopo <span class="red3">onPause()</span></li>
+        <li>Un'activity puó attraversare diverse volte i metodi tra <span class="red3">onCreate()</span> e <span class="red3">onDestroy()</span> nel suo ciclo di vita</li>
+        <li>Dobbiamo preoccuparci di rilasciare le risorse durante i metodi di terminazione</li>
+        <li>Attenzione ai memory leak! (vedremo esempi)</li>
+    </article>
+  </slide>
+
+
+  <slide>
+    <hgroup>
+      <h2>Activity </h2>
+      <h3>code</h3>
+    </hgroup>
+    <article class="smaller">
+    <pre class="prettyprint" data-lang="java">
+      package com.corso.sample.activity;
+      import com.corso.sample.R;
+      import android.app.Activity;
+      
+      <b>public class ExampleActivity extends Activity {</b>
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+          super.onCreate(savedInstanceState);
+          // The activity is being created.
+          setContentView(R.layout.my_layout);
+        }
+      <b>}</b></pre>
+    <pre class="prettyprint" data-lang="xml">
+      &lt;application&gt;
+        <b>&lt;activity android:name=".activity.ExampleActivity"</b>
+            android:label="@string/app_name"
+            android:icon="@drawable/ic_launcher"<b>&gt;</b>
+            &lt;!-- ..... --&gt;
+        <b>&lt;/activity&gt;</b>
+      &lt;/application&gt;</pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Activity </h2>
+      <h3>more code</h3>
+    </hgroup>
+    <article class="smaller">
+      <section>
+      <pre class="prettyprint" data-lang="xml"><b>
+      &lt;?xml version="1.0" encoding="utf-8"?&gt;
+      &lt;!-- res/layout/mylayout.xml --&gt;
+      &lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"&gt;
+        &lt;TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hello"/&gt;
+      &lt;/LinearLayout&gt;</b></pre>
+      <pre class="prettyprint" data-lang="xml">
+      &lt;resources&gt;
+        &lt;string name="app_name"&gt;Sample&lt;/string&gt;
+        &lt;string name="hello"&gt;Hello world!/string&gt;
+      &lt;/resources&gt;</pre>
+      </section>
+    </article>
+  </slide>
+
+  <slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+        <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2 class="white">CODE</h2>
+    </hgroup>
+  </slide>
+
+  <slide >
+    <hgroup>
+      <h2>Wiews</h2>
+      <h3>Gestire l'interfaccia</h3>
+    </hgroup>
+    <article class="smaller">
+      <section>
+        <p>Dobbiamo poter recuperare le viste nel codice</p>
+        <pre class="prettyprint" data-lang="xml">
+          &lt;TextView 
+            <b>android:id="@+id/tv_hello"</b>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hello"/&gt;
+        </pre>
+        <pre class="prettyprint" data-lang="java">
+          <b>TextView mHello;</b>
+          @Override
+          public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.my_layout);
+            <b>mHelloOut = (TextView)findViewById(R.id.tv_hello);</b>
+          }
+        </pre>
+      </section>
+    </article>
+  </slide>
+
+   <slide >
+    <hgroup>
+      <h2>Wiews</h2>
+      <h3>Gestire l'interfaccia</h3>
+    </hgroup>
+    <article class="smaller">
+      <section>
+        <p>Alcune viste hanno associato un comportamento</p>
+        <pre class="prettyprint" data-lang="java">
+          View mInteractive;
+
+          @Override
+          public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.my_layout);
+            mInteractive = findViewById(R.id.btn);
+            <b>mInteractive.setOnClickListener(new OnClickListener{
+              @Override
+              public void onClick(View v){
+                //do something
+              }
+            });</b>
+          }
+        </pre>
+      </section>
+    </article>
+  </slide>
+
+  <slide >
+    <hgroup>
+      <h2>Wiews</h2>
+      <h3>Gestire l'interfaccia</h3>
+    </hgroup>
+    <article class="smaller">
+      <section>
+        <p>Alcune viste contengono dati</p>
+        <pre class="prettyprint" data-lang="java">
+          //....
+          @Override
+          public void onCreate(Bundle savedInstanceState) {
+            //....
+            mInteractive = (EditText)findViewById(R.id.btn);
+            mReplaceButton.setOnClickListener(this);
+          }
+          @Override
+          public void onClick(View v){
+            if(v.getId()==mReplaceButton.getId()){
+              mSavedContent = replaceContent(mSavedContent);
+            }
+          }
+          //...
+          <b>
+          private String replaceContent(String content){
+            Editable content =mInteractive.getText();
+            mInteractive.setText(content);
+            return content.toString();
+          }</b>
+        </pre>
+      </section>
+    </article>
+  </slide>
+
+  <slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+        <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2 class="white">CODE</h2>
+    </hgroup>
+  </slide>
+
+
+  <slide>
+    <hgroup><h2>Activity</h2>
+    <h3>Mantenere lo stato</h3>
+    </hgroup>
+      <article class="smaller">
+      <p>Il sistema operativo puó interrompere il nostro processo</p>
+      <br/>
+      <section class="build">
+      <ul>
+      <li>
+        Per recuperare memoria o durante un cambio di configurazione (Es. rotazione dello schermo)
+      </li>
+      <li>Dobbiamo salvare lo stato in modo persistente, (il processo viene deallocato)</li>
+
+      </ul>
+      <pre class="prettyprint" data-lang="java">
+          <b>private final static String SAVED_KEY="SAVED_KEY";
+          @Override
+          public void onCreate(Bundle savedInstanceState) {
+            if(savedInstanceState!=null){
+              //activity restarted
+              mState =  savedInstanceState.getBoolean(SAVED_KEY);
+            }else{
+              mState = initializeState();
+            }
+          }</b>
+          @Override
+          protected void onRestoreInstanceState(Bundle savedInstanceState){/*or here after onStart()*/}
+          <b>@Override
+          protected void onSaveInstanceState(Bundle outState){
+            outState.putBoolean(SAVED_KEY,mState)
+          }</b></pre>
+      </section>
+      </article>
+  </slide>
+  <slide>
+    <hgroup><h2>Activity</h2>
+    <h3>Navigazione</h3>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <ul class="build">
+        <li>Creare link tra activity</li>
+        <li>Delegare l'esecuzione di un task ad un'altra activity e riceverne il risultato</li>
+        <li>Ricordiamo che la comunicazione avviene sempre tramite intent</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup><h2>Activity</h2>
+    <h3>Navigazione 2</h3>
+    </hgroup>
+    <article class="build fade smaller">
+        <section>
+          <p>Creare link tra activity</p>
+          <pre class="prettyprint" data-lang="java">
+            private void launch(boolean implicit){
+              final Intent intent;
+              if(implicit){
+                intent = new Intent(this,AnotherActivityInMyPackage.class);
+              }else{
+                intent = new Intent("an.explicit.action");
+              }
+              intent.setData(Uri.parse("mydata://somedata/1000"));
+              intent.putExtra("A_KEY",1000);
+              this.startActivity(intent);
+            }</pre>
+        </section>
+        <section>
+          <p>Delegare l'esecuzione di un task</p>
+          <pre class="prettyprint" data-lang="java">
+            private final static int MY_REQUEST_CODE = 1;
+            //...
+            this.startActivityForResult(intent,MY_REQUEST_CODE);</pre>
+        </section>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup><h2>Activity</h2>
+    <h3>Navigazione 3</h3>
+    </hgroup>
+    <article class="build fade smaller">
+        <section>
+          <p>Creare link tra activity</p>
+          <pre class="prettyprint" data-lang="java">
+            @Override
+            public void onCreate(Bundle savedInstanceState){
+                handle(getIntent());
+            }
+            @Override
+            protected void onNewIntent(Intent intent){
+                setIntent(intent); //Optionally
+                handle(intent);
+            }
+            private void handle(Intent intent){}</pre>
+        </section>
+        <section>
+          <p>Delegare l'esecuzione di un task</p>
+          <pre class="prettyprint" data-lang="java">
+             setResult(RESULT_OK,new Intent().putExtra("content",response));
+             //data is optional
+             //setResult(int x); RESULT_OK RESULT_CANCELED RESULT_FIRS_USER
+             finish();</pre>
+        </section>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup><h2>Activity</h2>
+    <h3>Navigazione 4</h3>
+    </hgroup>
+    <article class="smaller">
+      <p>Ricevere il risultato</p>
+      <pre class="prettyprint" data-lang="java">
+        private final static int MY_REQUEST_CODE = 1;
+        //...
+        @Override
+        protected void onActivityResult (int requestCode, int resultCode, Intent data){
+          if(requestCode==MY_REQUEST_CODE){
+            if(resultCode==RESULT_OK){
+              //do something with data may be null
+            }else{
+              //do something when user refused to complete action
+            }
+          }else{
+            // not my business another request
+          }
+        }</pre>
+    </article>
+  </slide>
+
+  <slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+        <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2 class="white">CODE</h2>
+    </hgroup>
+  </slide>
+
+  <slide >
+    <hgroup>
+      <h2>AdapterViews</h2>
+      <h3>Gestire l'interfaccia</h3>
+    </hgroup>
+    <article class="build">
+      <section><p>Alcune viste sono collegate a modelli complessi:<br/> collection di un numero variabile di item, che a loro volta sono rappresentati da specifici insiemi di viste.
+      </p></section>
+      <section>
+        <ul>
+        <li>Gestione e visualizzazione del modello globale</li>
+        <li>Numero di item</li>
+        <li>Accesso al singolo item</li>
+        <li>Generazione della vista per lo specifico item</li>
+        </ul>
+      </section>
+      <section>
+        <p>Serve un ulteriore livello di indirezione:<br/>
+          introduciamo gli Adapter.
+        </p>
+      </section>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>AdapterViews</h2>
+      <h3>Code</h3>
+    </hgroup>
+    <article class="smaller build fade">
+      <pre class="prettyprint" data-lang="java">
+        public class MyAdapter extends BaseAdapter{
+          private final LayoutInflater mInflaterService;
+        //...
+          @Override
+          public View getView(int position,View convertView,View theList){
+            <b>View v = mInflaterService.inflate(R.layout.item_layout,theList,false);</b>
+            presentTheItem(<b>getItem(position)</b>);
+            return v;
+          }
+        }</pre>
+        <pre class="prettyprint" data-lang="java">
+        ListView lv = findViewById(R.id.list);
+        mAdapter = new MyAdapter((Context)this);
+        lv.setAdapter(adapter);
+        lv.setOnItemClickListener(/*the listener*/);</pre>
+        <pre class="prettyprint" data-lang="java">
+        private void updateData(){
+          doUpdtateData();
+          mAdapter.notifyDataSetChanged();
+        }</pre>
+    </article>
+  </slide>
+  <slide>
+    <hgroup>
+      <h2>AdapterViews</h2>
+      <h3>Note</h3>
+    </hgroup>
+    <article>
+    <ul class="build">
+      <li>Gli item possono essere associati a viste diverse</li>
+      <li>getView() viene chiamato per ogni item</li>
+      <li>getView() espande un nuovo layout per ogni item</li>
+      <li>spesso questa operazione é ridondante</li>
+      <li>solo una piccola porzione degli item é visibile sullo schermo</li>
+      <li>ViewHolder pattern o sottoclassi specifiche di Adapter</li>
+    </ul>
+    </article>
+  </slide>
+
+  <slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+        <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2 class="white">CODE</h2>
+    </hgroup>
+  </slide>
+
+  <!--
+
+  <slide class="segue dark quote nobackground">
+    <aside class="gdbar right bottom"><img src="images/google_developers_icon_128.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <q>
+        This is an example of quote text.
+      </q>
+      <div class="author">
+        Name<br>
+        Company
+      </div>
+    </article>
+  </slide>
+  -->
+ 
+  <!--
+  <slide class="thank-you-slide segue nobackground">
+    <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <h2>&lt;Thank You!&gt;</h2>
+      <p>Important contact information goes here.</p>
+    </article>
+    <p class="auto-fadein" data-config-contact>
+    </p>
+  </slide>
+
+  <slide class="logoslide dark nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/google_developers_logo_white.png"></span>
+    </article>
+  </slide>
+  -->
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!--<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+-->
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
