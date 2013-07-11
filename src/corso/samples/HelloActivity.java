@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -44,14 +45,29 @@ public class HelloActivity extends Activity implements OnClickListener{
 		startActivityForResult(callOtherActivity, MY_REQUEST);
 	}
 	
+	private void crash(){
+		String x = null;
+		try{
+			x.charAt(0);
+		}catch(NullPointerException e){
+			throw new AssertionError(e);
+		}
+	}
 
+	private void callsCrash(){
+		crash();
+	}
+	
 	@Override
 	public void onClick(View v) {
+//		callsCrash();
+		
 		if(USE_OTHER_ACTIVITY) {
 			handleWithOtherActivity();
 		} else {
 			handleByMyself();
 		}
+		
 	}
 
 	private void handleByMyself() {
@@ -68,8 +84,10 @@ public class HelloActivity extends Activity implements OnClickListener{
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
 		if(requestCode == MY_REQUEST && resultCode == RESULT_OK && data != null){
 			mLastInput = data.getStringExtra("RESULT");
+			
 			mOutput.setText(mLastInput);
 		}
 		
