@@ -2,20 +2,20 @@ package corso.samples.lists;
 
 import java.util.List;
 
-import corso.samples.R;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import corso.samples.R;
 
-class BasicAdapter extends BaseAdapter{
+public class BasicAdapter extends BaseAdapter{
 	
 	private final List<String> mModel;
 	private LayoutInflater mInflater;
 	
-	BasicAdapter(Context context,List<String> model) {
+	public BasicAdapter(Context context,List<String> model) {
 		mModel = model;
 		mInflater = LayoutInflater.from(context);
 	}
@@ -33,6 +33,7 @@ class BasicAdapter extends BaseAdapter{
 	public long getItemId(int position) {
 		return position;
 	}
+	
 
 	@Override
 	public View getView(int position, View recycledView, ViewGroup listView) {
