@@ -2,6 +2,7 @@
           
           <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="17"/>
           
+          <uses-permission android:name="android.permission.INTERNET"/>
    <application android:allowBackup="true" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/AppTheme">
             	<activity android:name="corso.samples.HelloActivity">
             	    <!--  <intent-filter>
@@ -19,11 +20,21 @@
                     
             </activity> 
             <activity android:name="corso.samples.fragments.dynamic.DynamicFragmentsActivity">
+              
+            </activity>
+            <activity android:name="corso.samples.concurrency.ConcurrentActivity">
+                
+            </activity>
+   	
+            <activity android:name="corso.samples.concurrency.DownloadActivity">
                 <intent-filter>
             	        <action android:name="android.intent.action.MAIN"/>
             	        <category android:name="android.intent.category.LAUNCHER"/>
-            	    </intent-filter>
+            	</intent-filter>
             </activity>
-   
+            
+            <service android:name="corso.samples.concurrency.DownloadIntentService">
+                
+            </service>
 </application>
 </manifest>
