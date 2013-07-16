@@ -27,14 +27,17 @@
             </activity>
    	
             <activity android:name="corso.samples.concurrency.DownloadActivity">
-                <intent-filter>
+               
+            </activity>
+            <activity android:name="corso.samples.feed.RssListActivity">
+                 <intent-filter>
             	        <action android:name="android.intent.action.MAIN"/>
             	        <category android:name="android.intent.category.LAUNCHER"/>
             	</intent-filter>
             </activity>
+            <service android:name="corso.samples.feed.RssService"/>
             
-            <service android:name="corso.samples.concurrency.DownloadIntentService">
-                
-            </service>
+            <provider android:name="corso.samples.feed.FeedProvider"
+                android:authorities="corso.samples.feed.provider"/>
 </application>
 </manifest>
