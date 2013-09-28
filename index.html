@@ -726,28 +726,134 @@ URL: https://code.google.com/p/io-2012-slides
   	</ul>
   	</article>
   </slide>
-  
+  <slide>
+    <hgroup>
+      <h2>Fragments</h2>
+      <h3>Code</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="java">
+	public class MyFragment extends Fragment {
+	  @Override
+          public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState){
+            View v = inflater.inflate(R.layout.my_fragment,container,false);
+	    // ... setup
+	    return v;
+	  }
+	
+	  @Override
+	  public void onActivityCreated(Bundle savedInstanceState){
+            // ...
+          }
+          // ...
+	}
+</<pre>
+    <pre class="prettyprint" data-lang="xml">
+     &lt;!-- in the layout for the activity --&gt;
+     &lt;!-- .... --&gt;
+     &lt;fragment class="com.example.MyFragment"
+               android:id="@+id/MyFragmentId"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"/&gt;
+   </pre>
+    </article>
+  </slide>
+<slide>
+    <hgroup>
+        <h2>Fragments</h2>
+        <h3>Code</h3>
+    </hgroup>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="java">
+            public class MyActivity extends FragmentActivity{
+                @Override
+                public void onCreate(Bundle savedInstanceState){
+                    setContentView(R.layout.my_activity);
+                    //...
+                   <b> FragmentManager manager = getSupportFragmentManager();
+                    MyFragment f = (MyFragment)manager.findFragmentById(R.id.MyFragmentId);
+                   </b>
+                }
+            }</pre>
+    </article>
+</slide>
    <slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
         <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
     <hgroup class="auto-fadein">
       <h2 class="white">CODE</h2>
     </hgroup>
   </slide>
-  <!--
 
-  <slide class="segue dark quote nobackground">
-    <aside class="gdbar right bottom"><img src="images/google_developers_icon_128.png"></aside>
-    <article class="flexbox vleft auto-fadein">
-      <q>
-        This is an example of quote text.
-      </q>
-      <div class="author">
-        Name<br>
-        Company
-      </div>
+<slide>
+    <hgroup><h2>Fragment Dinamici</h2>
+        <h3>Introduzione</h3>
+    </hgroup>
+    <article class="smaller">
+        <ul class="build">
+            <li>I fragment possono non essere dichiarati staticamente nei layout</li>
+            <li>In questo caso possono non avere una vista associata</li>
+            <li><pre class="prettyprint" data-lang="java">
+                // in the activity
+
+                private final static String TRANSACTION_TAG = "A TAG";
+
+                //...
+
+                MyFragment f = new MyFragment();
+
+                FragmentManager m = getSupportFragmentManager();
+                m.beginTransaction()
+                 .replace(R.id.viewgroup,f,TRANSACTION_TAG)
+                 .addToBackStack(null)
+                 .commit();
+
+                //..
+
+                m.findFragmentByTag(TRANSACTION_TAG);</pre> </li>
+        </ul>
     </article>
-  </slide>
-  -->
+</slide>
+
+<slide>
+    <hgroup><h2>Fragment</h2>
+        <h3>... non finisce qui</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>I fragment si rivelano utili in molte situazioni, diverse da quelle per
+            cui
+            sono stati progettati.</li>
+        <li>Possiamo separare il ciclo di vita da quello dell'activity
+            <pre class="prettyprint" data-lang="java">setRetainInstance(true);</pre></li>
+            <li>Utile per salvare stato dell'applicazione complesso
+                <b>Fragment Memory Card</b></li>
+            <li>Utile supporto per la concorrenza: fa da bridge con altri thread.</li>
+        </ul>
+    </article>
+</slide>
+
+<slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2 class="white">CODE</h2>
+    </hgroup>
+</slide>
+
+<!--
+
+<slide class="segue dark quote nobackground">
+  <aside class="gdbar right bottom"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <q>
+      This is an example of quote text.
+    </q>
+    <div class="author">
+      Name<br>
+      Company
+    </div>
+  </article>
+</slide>
+-->
  
   <!--
   <slide class="thank-you-slide segue nobackground">
