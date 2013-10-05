@@ -838,7 +838,666 @@ URL: https://code.google.com/p/io-2012-slides
         <h2 class="white">CODE</h2>
     </hgroup>
 </slide>
+<slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2>Terza lezione</h2>
+        <h3>Persistenza</h3>
+    </hgroup>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Persistenza</h2>
+        <h3>Alternative</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>File system</li>
+            <li>Preferenze</li>
+            <li>Database</li>
+        </ul>
+    </article>
+</slide>
 
+<slide>
+    <hgroup>
+        <h2>Persistenza</h2>
+        <h3>File system</h3>
+    </hgroup>
+    <article class="smaller">
+        <ul class="build">
+            <li><p>Internal private storage</p>
+            <pre class="prettyprint" data-lang="java">
+                String FILENAME = "myprivatefile";
+                FileInputStream in =context.openFileInput(FILENAME,Context.MODE_PRIVATE);
+                //...
+                FileOutputStream out = context.openFileOutput(FILENAME,Context.MODE_PRIVATE);</pre>
+            </li>
+            <li><p>Caching</p>
+            <pre class="prettyprint" data-lang="java">
+                File f =context.getCacheDir(); // i file possono essere rimossi dal sistema</pre> </li>
+            <li><p>External storage</p>
+                <pre class="prettyprint" data-lang="java">
+                    // controllare se abbiamo un sd
+                    Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+                    // aprire la nostra root sull'sd esterna
+                    File f =Environment.getExternalFilesDir(); // /Android/data/mio.package/files/
+                    File f =Environment.getExternalStoragePublicDirectory(DIRECTORY_MUSIC); //shared</pre>
+            </li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Persistenza</h2>
+        <h3>Preferences</h3>
+    </hgroup>
+    <article class="smaller build">
+        <p>Specifiche per activity o globali (con nome)</p>
+        <p>Salvate come file xml nello storage interno</p>
+        <pre class="prettyprint" data-lang="java">
+            SharedPreferences localPrefs = activity.getPreferences();
+
+            SharedPreferences prefs = context.getSharedPreferences("PREFS_FILE",MODE_PRIVATE);
+            boolean myOptionalPref = context.getBoolean("onOffPreference",/*default*/false);
+            String myOptionalText = context.getString("textPreference",/*default*/"fallback");
+            //...
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("key",false)
+                  .putInt("intKey",69)
+                  .commit():
+        </pre>
+    </article>
+</slide>
+
+<slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2>Terza lezione</h2>
+        <h3>Database</h3>
+    </hgroup>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Database</h2>
+        <h3>SQLite</h3>
+    </hgroup>
+    <article>
+        <p>SQLite é un database embedded (nessuna connessione tramite jdbc) gira nel nostro
+            stesso processo </p>
+        <p>Non ha tutte le funzionalitá di un database full fledged</p>
+        <p>Il db é un singolo file</p>
+        <p>Non é tipizzato: una colonna puó contenere qualsiasi tipo</p>
+        <p>Manca di alcune features importanti come gli outer join e i foreign constraints
+            sono disabilitati di default</p>
+        <p>Pessima concorrenza</p>
+        <p>Nonostante tutto ottimo per applicazioni embedded</p>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Database</h2>
+        <h3>SQLite</h3>
+    </hgroup>
+    <article class="smaller">
+        <p>Creiamo un db tramite SQliteOpenHelper</p>
+        <pre class="prettyprint" data-lang="java">
+            public class TodoOpenHelper extends SqliteOpenHelper{
+               TodoOpenHelper(Context context){
+                    super(context,DATABASE_FILE,/*CursorFactory*/null,DATABASE_INT_VERSION);
+               }
+
+               public void onCreate(SQLiteDatabase db) {
+                 db.execSql(CREATE_TABLE_SQL);
+               }
+
+               public void onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion) {
+                 db.execSql(ALTER_TABLE_SQL);
+               }
+                //....
+            }
+        </pre>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Database</h2>
+        <h3>Interazione</h3>
+    </hgroup>
+    <article class="smaller">
+    <pre class="prettyprint" data-lang="java">
+        TodoHelper helper = ...;
+        SQLiteDatabase db =helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues(); // riga da inserire
+        long newid=db.insert("table_name",null,values);
+        int numUpdates=db.update("table_name",null,values,"_id = ?",new String[]{"1"});
+        int numDeletes=db.delete("table_name","_id = ?",new String[]{"2"});
+        Cursor cursor =db.query("table_name",
+                                new String[]{"_id","text"},"_id = ?",new String[]{"3"},
+                                /*groupby*/null,/*having*/null,/*orderby*/null,/*limit*/null);
+
+        int count = cursor.getCount();
+        if(cursor.moveToFirst()){
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+        }
+
+        cursor.close();
+    </pre>
+    </article>
+    </slide>
+</slide>
+
+<slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2>Terza lezione</h2>
+        <h3>Content Providers</h3>
+    </hgroup>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>ContentProviders</h2>
+        <h3>Introduzione</h3>
+    </hgroup>
+    <article class="build">
+        <p>developers.android.com dice "you don't need content providers if you don't want to
+            share content with other apps but..."</p>
+        <ul class="build">
+            <li>Vi serve se volete implemetare facilmente search e suggerimenti</li>
+            <li>Vi serve se volete implementare il drag & drop con le altre app</li>
+            <li>Vi serve se volete sfruttare al meglio gli altri componenti del
+                framework</li>
+            <li>Vi serve se volete sincronizzare i dati in modo facile con la rete</li>
+            <li><span class="red">Vi serve se volete strutturare bene un app</span></li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup><h2>Content Providers</h2>
+        <h3>Elementi essenziali</h3>
+    </hgroup>
+    <article class="build">
+        <p>I content provider implementano un'architettura client/server</p>
+        <p>Client: ContentResolver <-> Server: ContentProvider</p>
+        <p>Un CP risponde ad una o piú <span class="blue">AUTHORITY</span> </p>
+        <p>Si comunica con un CP tramite uri nella forma <b>content://authority/path</b></p>
+        <p>I CP possono implementare schemi complessi di permessi</p>
+        <p>API ottimizzata per dati tabulari (SQL) o file, ma nessun altro enforcement per il
+            backend</p>
+        <p>Possono auto sincronizzarsi con la rete</p>
+        <p>Consentono di creare ui reattive</p>
+    </article>
+</slide>
+
+<slide>
+    <hgroup><h2>Content Providers</h2>
+        <h3>Api client side</h3>
+    </hgroup>
+    <article class="smaller build">
+        <pre class="prettyprint" data-lang="java">
+            // lato client stessa api di sqlite con in piú l'uri
+            ContentResolver resolver =context.getContentResolver();
+            Cursor cursor =resolver.query(uri,projection,selection,selectionArgs,null,null,null);
+            // o per l'apertura di file
+            InputStream input =resolve.openInputStream(uri);</pre>
+        <pre class="prettyprint" data-lang="java">
+            // il content provider
+            public class TodoProvider extends ContentProvider{
+                public boolean onCreate(){}
+
+                public Cursor query(Uri uri,String[] projection,String selection,...);
+                public Uri insert(Uri uri,ContentValues values);
+                public int delete(Uri,...);
+                public int update(Uri uri,...);
+                public String getType(Uri uri);
+                public ParcelFileDescriptor openFile(Uri uri,String mode);
+            }</pre>
+        <pre class="prettyprint" data-lang="xml">
+            &lt;!--nel manifest--&gt;
+            &lt;provider android:authorities="com.jdk.todo.provider"
+                         android:readPermission="com.jdk.permissions.READ_TODO"
+                         android:writePermission="com.jdk.permissions.WRITE_TODO"&gt;>
+            &lt;/provider&gt;
+        </pre>
+    </article>
+</slide>
+<slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2 class="white">CODE</h2>
+    </hgroup>
+</slide>
+<slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2>Terza lezione</h2>
+        <h3>Concorrenza</h3>
+    </hgroup>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Necessaria...</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>L'event loop principale deve essere libero da operazioni costose</li>
+            <li>Le operazioni di I/O bloccano il thread su cui vengono eseguite</li>
+            <li>In particolare l'accesso alla rete</li>
+            <li>Android su questo é molto severo:</li>
+            <li><article class="smaller">
+                <pre class="prettyprint" data-lang="java">05-14 23:52:47.258:
+                    E/AndroidRuntime(21329): <b>FATAL EXCEPTION</b>: main
+05-14 23:52:47.258: E/AndroidRuntime(21329): <b>android.os.NetworkOnMainThreadException</b>
+05-14 23:52:47.258: E/AndroidRuntime(21329):    at
+                    android.os.StrictMode$AndroidBlockGuardPolicy.onNetwork(StrictMode.java:1126)
+05-14 23:52:47.258: E/AndroidRuntime(21329):    at
+                    java.net.InetAddress.lookupHostByName(InetAddress.java:385)
+05-14 23:52:47.258: E/AndroidRuntime(21329):    at
+                    java.net.InetAddress.getAllByNameImpl(InetAddress.java:236)
+05-14 23:52:47.258: E/AndroidRuntime(21329):    at
+                    java.net.InetAddress.getAllByName(InetAddress.java:214)
+05-14 23:52:47.258: E/AndroidRuntime(21329):    at
+                    libcore.net.http.HttpConnection.&lt;init&gt;(HttpConnection.java:70)
+                    ....
+</pre></article></li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+        <img src="images/concurrency.jpg"/>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Componenti essenziali</h3>
+    </hgroup>
+    <article class="build">
+        <p>L'unitá di concorrenza in java é il Thread</p>
+        <p>Ogni thread esegue un path di esecuzione indipendente. In modo concorrente,
+            (realmente concorrente se siamo su un multi core)</p>
+        <p>Un Thread é anche una radice per quanto concerne il garbage collector, la concorrenza é
+           la causa dei memory leak</p>
+        <p>I thread hanno bisogno di comunicare tra loro e sincronizzarsi</p>
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Threads</h3>
+    </hgroup>
+    <article>
+
+    <p>Uso diretto dei thread</p>
+    <ul class="build">
+        <li class="green">Completa gestione del multithreading</li>
+        <li class="red">Non gestiscono il ciclo di vita dei componenti android</li>
+        <li class="red">Non facilitano update della ui</li>
+    </ul>
+
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Threads</h2>
+        <h3>Quando usarli</h3>
+    </hgroup>
+    <article>
+        <ul>
+            <li>Necessitiamo un controllo diretto e preciso del multithreading</li>
+            <li>Conosciamo esattamente il comportamento della concorrenza nella nostra
+                applicazione</li>
+            <li>Sappiamo come sincronizzarli e metterli in comunicazione, (lock, semafori,
+                mutex, atomic CAS)</li>
+        </ul>
+    </article>
+</slide>
+
+<slide class="fill nobackground" style="background-image: url(images/locks.jpg)">
+    <hgroup>
+        <h2 class="white">...ad esempio...</h2>
+    </hgroup>
+</slide>
+
+<slide class="fill nobackground" style="background-image: url(images/semaphores.jpg)">
+
+</slide>
+<slide class="fill nobackground" style="background-image: url(images/traffic.jpg)">
+    <hgroup>
+        <h2 class="white">Chiaro?</h2>
+    </hgroup>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>... continua...</h3>
+    </hgroup>
+    <article class="build">
+        <p>Threads e  lock, anche se a volte necessari, sono strumenti di basso
+            livello.</p>
+        <p>In particolare, non possiamo comunque bloccare il thread della ui, in attesa di un mutex</p>
+        <p>Ci servono altre primitive</p>
+    </article>
+</slide>
+<slide class="fill nobackground" style="background-image: url(images/atom.jpg)">
+    <hgroup>
+        <h2 class="white">atomic CAS</h2>
+    </hgroup>
+</slide>
+
+<slide class="fill nobackground" style="background-image: url(images/nuke.jpg)">
+    <hgroup>
+        <h2 class="white">....ehr</h2>
+    </hgroup>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Threads</h2>
+        <h3>Esempio</h3>
+    </hgroup>
+    <article>
+        <pre class="prettyprint" data-lang="java">
+            private TextView mTv;
+
+            protected void onCreate(Bundle savedInstanceState) {
+               //...
+               mTv = (TextView)findViewById(...);
+               new Thread(){
+                 public void run() {
+                    final String result = obtainStringFromBlockingSource();
+                    // mTv.setText(result); -> Exception ui update from non Main Thread
+                    <b>runOnUiThread</b>(new Runnable(){
+                        public void run(){
+                            mTv.setText(result);
+                        }
+                    })
+                 }
+               }.start();
+            }
+        </pre>
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Threads</h2>
+        <h3>Problemi</h3>
+    </hgroup>
+    <article class="build">
+        <p><span class="red">Leak!</span> Il thread (non statico) contiene un
+            riferimento all'activity, il garbage collector non puó eliminarla.
+            Rischio di OutOfMemory</p>
+        <p>mTv non é piú visibile dopo un cambio di configurazione</p>
+        <p>Strategia: bloccare il thread in onDestroy o onStop e riprendere il lavoro in
+            onStart()</p>
+        <p>Minimizzare il rischio di thread non interruptible, ad esempio timeout,
+            controllare InterruptedException</p>
+        <p>Minimizzare il rischio di memory leak, disaccoppiando l'activity dal thread: retained
+            fragments</p>
+        <p>Ancora meglio:</p>
+        <p class="red"><b>Non usate i thread nelle activity a meno che non siate sicuri di
+            quello che state facendo</b></p>
+    </article>
+</slide>
+
+<slide class="fill nobackground" style="background-image: url(images/nuke.jpg)">
+    <hgroup>
+        <h2 class="white">sicuri</h2>
+    </hgroup>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Soluzioni</h2>
+        <h3>AsyncTask</h3>
+    </hgroup>
+    <article class="build">
+    <p>Facilita l'interazione con la ui</p>
+    <p>Sconsigliabile per operazioni di lunga durata.</p>
+    <p>Non gestisce il cilco di vita delle activity.</p>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="java">
+            public class Task extends AsyncTask&lt;Params,Progress,Result&gt;{
+                protected void onPreExceute(){/* OPT sul thread della ui prima di essere avviato*/}
+
+                protected Result doInBackground(Params... params){
+                    //REQ esegue il lavoro in background
+                    publishProgress(Progress...); // invia risultati parziali al thread della ui
+                }
+
+                protected void onProgressUpdate(Progress... progress){
+                    //OPT callback di publishProgress()
+                }
+                protected void onPostExecute(Result res){
+                    //OPT riceve il valore di ritorno da doInBackground sulla ui
+                }
+            }
+        </pre>
+    </article>
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h3>...continua</h3>
+    </hgroup>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="java">
+            public AsyncTask execute(Params ... params); //avvia il task
+
+            public final boolean cancel(boolean interrupt); //aborts
+
+            public final boolean isCancelled(); // is aborted
+
+            public void onCancelled(){ } // callback di cancel
+
+        </pre>
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h2>AsyncTask</h2>
+        <h3>Valutazione</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>Meglio dei thread</li>
+            <li>Leak ancora presenti</li>
+            <li>Non usare inner classes non statiche</li>
+            <li>Usare weak reference per aiutare il garbage collector</li>
+            <li>Cancellare prima di onDestroy</li>
+            <li>Disaccopiare dall'activity tramite retained Fragments</li>
+        </ul>
+    </article>
+</slide>
+
+<slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2 class="white">CODE</h2>
+    </hgroup>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>L'engine di Async Task</h3>
+    </hgroup>
+    <article>
+    <p>Async Task sfrutta al suo interno tre componenti basilari di android</p>
+    <ul class="build">
+        <li><span class="red">Looper:</span> l'astrazione di un ciclo while true associato ad
+            un thread</li>
+        <li><span class="red">MessageQueue:</span> coda di messaggi associata ad un looper</li>
+        <li><span class="red">Handler:</span> gestori di messaggi associati al looper</li>
+        <li>Sul main thread gira il looper principale</li>
+        <li>Dei tre l'unico che si usa direttamente nel codice utente con una certa frequenza
+            é l'handler</li>
+    </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup><h2>Concorrenza</h2>
+        <h3>Handler</h3>
+    </hgroup>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="java">
+            private final static int ARG = 1;
+            private final static int EVENT_1 = 1;
+
+            public MyHandler extends Handler{
+                @Override
+                public void handleMessage(Message msg) {
+                    switch(msg.what) {
+                        case EVENT_1:
+                            handleEvent(msg.obj,msg.arg1,msg.arg2);
+                            break;
+                        //...
+                    }
+                }
+            }
+
+            MyHandler handler = new MyHandler();
+            //...
+
+            Message msg =handler.obtainMessage(EVENT_1,ARG,ARG,"ciao");
+            handler.sendMessage(msg);
+            handler.sendMessageDelayed(handler.obtainEmptyMessage(EVENT_1),1000);
+            handler.post(new Runnable(){/*code to execute*/})
+
+            handler.removeMessages(EVENT_1);</pre>
+    </article>
+
+</slide>
+<slide>
+    <hgroup><h2>Concorrenza</h2>
+    <h3>Alternative</h3></hgroup>
+    <article>
+        <p>AsyncQueryHandler</p>
+        <p>Wrappa un contentResolver: le operazioni sono effettuate serialmente su un
+            looper in background</p>
+        <pre class="prettyprint" data-lang="java">
+            private final static int QUERY_ID = 1;
+
+            private static class ContentHandler extends AsyncQueryHandler{
+                protected void onQueryComplete(int token,Object cookie,Cursor result){
+                    // callback
+                }
+            }
+            ContentHandler h = new ContentHandler(getContentResolver());
+
+            h.startQuery(QUERY_ID,/*cookie*/null,uri,....);
+        </pre>
+    </article>
+</slide>
+<slide>
+    <hgroup><h2>Concorrenza</h2>
+    <h3>Alternative</h3></hgroup>
+    <article>
+        <p>HandlerThread un thread su cui gira un looper</p>
+        <pre class="prettyprint" data-lang="java">
+            public class MyLoopingThread extends HandlerThread{
+
+                public MyLoopingThread(){
+                    super("name for debugging purposes");
+                }
+
+                @Override
+                protected void onLooperPrepared() {
+                    // do some setup before start looping
+                }
+
+                public Handler createHandler(Handler.Callback callback){
+                    return new Handler(getLooper(),callback);
+                }
+            }
+        </pre>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Loaders</h3>
+    </hgroup>
+    <article>
+        <p>I loader permettono di caricare dati in background in modo sicuro</p>
+        <ul class="build">
+            <li>Effettuano un task in background (come async task)</li>
+            <li>Restituiscono il risultato sul main thread (come async task)</li>
+            <li>Continuano ad eseguire il task durante un cambio di configurazione (come
+                async task)</li>
+            <li><span class="green">Ricordano il loro stato tra una configurazione e l'altra</span></li>
+            <li><span class="green">Possono monitorare una sorgente dati (CP) e notificare
+                l'activity dei cambiamenti.</span></li>
+            <li>rileggete bene il punto precedente</li>
+            <li>rileggetelo ancora</li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Loaders Continua</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>Presenti dall'api 11</li>
+            <li>Usabili con la supprt library dall'api 4</li>
+            <li>Non possono essere implementati come classi interne non statiche (policy
+                enforced)</li>
+            <li>due componenti
+                <ul>
+                    <li><span class="blue">Loader:</span> che si occupa di fare il lavoro</li>
+                    <li><span class="blue">Loader.Callbacks:</span> che vengono notificati
+                        dal loader quando l'operazione é conclusa</li>
+                    <li>Gestiti tramite LoaderManager</li>
+                </ul>
+            </li>
+            <li>Ci interessa in particolare il CursorLoader</li>
+        </ul>
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Loaders Continua</h3>
+    </hgroup>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="java">
+                private final static int ID = 1;
+                //il loader manager avvia un loader identificato da un id se e solo se non
+                //ne esiste giá uno precedente (anche in una configurazione precedente)
+                getSupportLoaderManager().initLoader(ID,null,fCallbacks);
+                // fCallbacks viene notificato quando il risultato é realizzato
+
+                 //kill currently running loader notify if already completed
+                getSupportLoaderManager().destroyLoader(ID);
+
+                // praticamente la somma dei due precedenti
+                getSupportLoaderManager().restartLoader(ID,null fCallbacks
+            </pre>
+    </article>
+</slide>
+<slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2 class="white">CODE</h2>
+    </hgroup>
+</slide>
 <!--
 
 <slide class="segue dark quote nobackground">
