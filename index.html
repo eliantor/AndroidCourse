@@ -306,6 +306,7 @@ URL: https://code.google.com/p/io-2012-slides
         <li>Un'activity puó attraversare diverse volte i metodi tra <span class="red3">onCreate()</span> e <span class="red3">onDestroy()</span> nel suo ciclo di vita</li>
         <li>Dobbiamo preoccuparci di rilasciare le risorse durante i metodi di terminazione</li>
         <li>Attenzione ai memory leak! (vedremo esempi)</li>
+       </ul>
     </article>
   </slide>
 
@@ -747,7 +748,7 @@ URL: https://code.google.com/p/io-2012-slides
           }
           // ...
 	}
-</<pre>
+</pre>
     <pre class="prettyprint" data-lang="xml">
      &lt;!-- in the layout for the activity --&gt;
      &lt;!-- .... --&gt;
@@ -1477,6 +1478,7 @@ URL: https://code.google.com/p/io-2012-slides
         <h3>Loaders Continua</h3>
     </hgroup>
     <article class="smaller">
+        <p>Gestire e creare i loader</p>
         <pre class="prettyprint" data-lang="java">
                 private final static int ID = 1;
                 //il loader manager avvia un loader identificato da un id se e solo se non
@@ -1492,12 +1494,311 @@ URL: https://code.google.com/p/io-2012-slides
             </pre>
     </article>
 </slide>
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Loaders Callbacks</h3>
+    </hgroup>
+    <article class="smaller">
+        <p>Implementare le callback necessarie nell'activity</p>
+        <pre class="prettyprint" data-lang="java">
+
+            LoaderManager.LoaderCallbacks&lt;T&gt; fCallbacks =
+               new LoaderManager.LoaderCallbacks&lt;T&gt;() {
+                 public Loader&lt;T&gt; onCreateLoader(int id, Bundle args) {
+                   /* create and return a loader for the id and arguments*/
+                   /* cursor loader is the most used tipically we won't need to implement
+                      a new one */
+                   return new MyLoader(context);
+                 }
+
+                 public void onLoadFinished(Loader&lt;T&gt; loader, T data) {
+                   /* use loaded data */
+                 }
+
+                 public void onLoaderReset(Loader&lt;T&gt; loader) {
+                   /* loader has been reset clear data */
+                 }
+            }
+        </pre>
+    </article>
+</slide>
+
 <slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
     <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
     <hgroup class="auto-fadein">
         <h2 class="white">CODE</h2>
     </hgroup>
 </slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Custom Loaders</h3>
+    </hgroup>
+    <article class="smaller">
+        <p>Implementare un loader custom</p>
+        <pre class="prettyprint" data-lang="java">
+            public class MyLoader extends AsyncTaskLoader&lt;T&gt;{
+              private T mData;
+
+              public MyLoader(Context context) {
+                super(context);
+              }
+              // background work
+              @Override public T loadInBackground() {
+                T data  = loadYourData();
+                return data;
+              }
+            }
+        </pre>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Custom Loaders</h3>
+    </hgroup>
+    <article class="smaller">
+        <p>Implementare un loader custom</p>
+        <pre class="prettyprint" data-lang="java">
+              // delivers data to onLoadFinished
+              @Override public void deliverResult(T data) {
+                if(isReset()){
+                    // another request overrides the current one
+                    releaseYourData(data);
+                }
+                T old = mData; mData = data;
+                if(isStarted()) {
+                    // currently active
+                    super.deliverResult(mData);
+                }
+                releaseYourData(old);
+              }
+              @Override protected void onStartLoading() {
+                if(mData!=null) deliverResult(mData); // deliver current results;
+                // register watching T changes if possible (calling onContentChanged())
+                if(takeContentChanged()||mData==null) {
+                    forceLoad();
+                }
+              }
+        </pre>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Concorrenza</h2>
+        <h3>Custom Loaders</h3>
+    </hgroup>
+    <article class="smaller">
+        <p>Implementare un loader custom</p>
+        <pre class="prettyprint" data-lang="java">
+              @Override protected void onStopLoading(){
+                cancelLoad();
+              }
+              @Override public void onCanceled(T data){
+                super.onCanceled(data);
+                releaseYourData(data);
+              }
+              @Override public void onReset(){
+                super.onReset();
+                onStopLoading();
+                releaseYourData(mData);
+                mData = null;
+              }
+        </pre>
+    </article>
+</slide>
+
+<slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2>Quarta lezione</h2>
+        <h3>Services</h3>
+    </hgroup>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Service</h2>
+        <h3>Lavorare in background</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>Componente che lavora in background</li>
+            <li>Usato per operazioni long running</li>
+            <li>Non necessita dell'interazione dell'utente</li>
+            <li>Modalita' fire and forget, <span class="blue">Started</span> </li>
+            <li>Moadalita' client/server, <span class="blue">Bound</span> </li>
+            <li>O entrambe!</li>
+            <li>I servizi di android sono implementati tramite service</li>
+            <li class="red">Il codice viene comunque eseguito sul main thread!!</li>
+            <li class="red">Un service potrebbe essere spento dal sistema se gira per troppo tempo</li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Service</h2>
+        <h3>Ciclo di vita</h3>
+    </hgroup>
+    <article class="columns-2">
+        <img src="images/service_lifecycle.png"/>
+        <ul class="build">
+            <li>Molto piu' semplice del ciclo di vita dell'activity</li>
+            <li>Apparentemente:</li>
+            <li>Le due modalita' si possono usare insieme</li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Service</h2>
+        <h3>Modalita' started</h3>
+    </hgroup>
+    <article>
+        <ul class="build">
+           <li>Il service viene avviato tramite intent</li>
+           <li>L'intent iniziale e' l'unico canale di comunicazione col service</li>
+           <li>Resta attivo fino a segnalazione esplicita</li>
+           <li>Quando si stoppa il service viene immediatamente distrutto</li>
+           <li>Piu' tempo resta attivo piu' aumenta la probabilita' che il sistema lo killi prematuramente</li>
+           <li>Siamo noi a decidere in che modo reagire a questo evento</li>
+            <li>Se facciamo partire piu' volte un servizio gia' attivo gli intent arrivano sempre allo stesso service</li>
+            <li>Nota: onBind va sempre implementato!</li>
+        </ul>
+    </article>
+</slide>
+
+
+<slide>
+    <hgroup>
+        <h2>Service</h2>
+        <h3>Basic implementation</h3>
+    </hgroup>
+    <article>
+        <ul class="build smaller">
+                <pre class="prettyprint" data-lang="xml">
+                    &lt;service android:name=".MyService"&gt;
+                        &lt;intent-filter&gt;
+                            &lt;-- .... --&gt;
+                        &lt;/intent-filter&gt;
+                    &lt;/service&gt;</pre>
+            </li>
+            <li>
+                <pre class="prettyprint" data-lang="java">
+                    public class MyService extends Service {
+                        @Override public IBinder onBind(Intent intent){
+                              return null; // metodo astratto che va sempre implementato
+                        }
+                        @Override public int onStartCommand(Intent intent,
+                                                            int flags,int startId){
+                            return START_NOT_STICKY; //start mode
+                        }
+                    }</pre>
+            </li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Service</h2>
+        <h3>Basic implementation</h3>
+    </hgroup>
+    <article>
+            <li>
+                <pre class="prettyprint" data-lang="java">
+                    // avviare un service
+                    context.startService(new Intent(context,MyService.class));
+
+                    // stoppare un service started
+                    context.stopService(intent);
+
+                    // o dall'interno del service stesso
+                    stopSelf(int startId);
+                    stopSelf();
+                    stopSelfResult(int startId);
+
+                </pre>
+            </li>
+        </ul>
+    </article>
+</slide>
+
+
+<slide>
+    <hgroup>
+        <h2>Service</h2>
+        <h3>Start mode/startFlag/ startId</h3>
+    </hgroup>
+    <article class="build">
+        <ul><li>Start mode determina in che modo far ripartire un service se spento dal sistema</li>
+            <li><span class="red">START_NOT_STICKY</span> il service non viene riavviato </li>
+            <li><span class="red">START_REDELIVERY_INTENT</span> il service viene riavviato e l'ultimo intent viene ripresentato a startCommand</li>
+            <li><span class="red">START_STICKY</span> il service viene riavviato ma l'intent non viene rimandato al service</li>
+            <li>Start flag segnala la modalita' di avvio corrente</li>
+            <li><span class="green">0</span> nulla da dichiarare avvio normale del service</li>
+            <li><span class="green">START_FLAG_RETRY</span> il service e' riavviato perche' l'intent non e' stato processato</li>
+            <li><span class="green">START_FLAG_REDELIVERY_INTENT</span> il service e' riavviato con l'intent precedentemente non gestito</li>
+            <li>Start id e' l'identificativo univoco della chiamata a startService da usare per stoppare il servizio</li>
+        </ul>
+    </article>
+</slide>
+
+
+<slide class="segue fill nobackground" style="background-image: url(images/code-session.png)">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+        <h2 class="white">CODE</h2>
+    </hgroup>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Services</h2>
+        <h3>Modalita' bounded</h3>
+    </hgroup>
+    <article>
+        <ul>
+            <li>Modalita' client server</li>
+            <li>Bisogna restituire un IBinder</li>
+            <li>Per serivzi locali basta estendere Binder</li>
+            <li>Per servizi usabili da remoto bisogna usare un Messenger o AIDL</li>
+            <li>Non useremo AIDL</li>
+        </ul>
+    </article>
+</slide>
+<slide>
+    <hgroup>
+        <h2>Services</h2>
+        <h3>Modalita' bounded</h3>
+    </hgroup>
+    <article>
+        <pre class="prettyprint" data-lang="java">
+            private final ServiceConnection connection =
+                new ServiceConnection(){
+                public void onServiceConnected(ComponentName name,IBinder binder){
+                }
+                public void onServiceDisconnected(ComponentName name){}
+            };
+            //binding
+            bindService(intent,connection,/*flags*/Context.BIND_AUTO_CREATE);
+        </pre>
+    </article>
+</slide>
+<slide>
+    <hgroup><h2>Services Lifecycle</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+        <img src="images/service_binding_tree_lifecycle.png"/>
+    </article>
+</slide>
+
 <!--
 
 <slide class="segue dark quote nobackground">
